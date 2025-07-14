@@ -33,5 +33,38 @@ class Usuario(AbstractBaseUser):
     def __str__(self):
         return self.userid
 
+    # Pipeline: proceso de login encadenado
+    def login_pipeline(self, password):
+        # Paso 1: verificar credenciales
+        if not self.verifiLogin(password):
+            self.loginstatus = 'failed'
+            self.save()
+            return False
+        # Paso 2: actualizar estado
+        self.loginstatus = 'online'
+        self.save()
+        # Paso 3: registrar acceso (cookbook)
+        self.registrar_acceso()
+        return True
+
     def verifiLogin(self, password):
-        return self.check_password(password)
+        # Error/Exception Handling
+        try:
+            return self.check_password(password)
+        except Exception:
+            self.loginstatus = 'error'
+            self.save()
+            return False
+
+    # Cookbook: receta para registrar acceso
+    def registrar_acceso(self):
+        # Aquí podrías guardar en una tabla de auditoría, enviar notificación, etc.
+        pass
+
+    # Lazy-Rivers: método que solo calcula el último acceso si se solicita
+    @property
+    def ultimo_acceso(self):
+        # Simulación de acceso perezoso
+        return self.registerdate
+
+# Puedes agregar más funciones utilitarias (cookbook) y procesos encadenados (pipeline) según crezca tu lógica de usuario.
