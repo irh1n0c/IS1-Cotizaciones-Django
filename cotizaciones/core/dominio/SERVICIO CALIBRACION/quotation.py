@@ -30,3 +30,14 @@ class Quotation:
 
     def quotationvencida(self, ):
         pass
+
+    @staticmethod
+    def get_by_numQuotation(numQuotation, quotations_list):
+        """
+        Busca una cotización por su número en una lista de cotizaciones.
+        Retorna la cotización si la encuentra, de lo contrario None.
+        """
+        for quotation in quotations_list:
+            if quotation.numQuotation == numQuotation:
+                return quotation
+        return None
