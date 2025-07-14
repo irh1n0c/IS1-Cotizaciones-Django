@@ -25,7 +25,7 @@ class ClienteClinica(models.Model):
     nombres = models.CharField(max_length=255)
     apellidos = models.CharField(max_length=255)
     phone = models.CharField(max_length=20)
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True " sdsa")
     rfc = models.CharField(max_length=13)
 
     def __str__(self):
