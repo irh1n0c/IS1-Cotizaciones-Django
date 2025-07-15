@@ -121,4 +121,4 @@ Este proyecto está en desarrollo activo. Para contribuir:
 
 [Información de contacto del desarrollador o equipo]
 
-![Diagrama UML](sources/digrama_uml.png)
+![Diagrama uml](sources/diagrama_uml.png)
