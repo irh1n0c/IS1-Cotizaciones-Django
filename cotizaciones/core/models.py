@@ -15,10 +15,7 @@ def generar_userid(email):
 class UsuarioManager(BaseUserManager):
     def create_user(self, userid, password=None, **extra_fields):
         # Error/Exception Handling
-        try:
-            validar_email_unico(extra_fields.get('email'))
-        except ValidationError as e:
-            raise e
+        validar_email_unico(extra_fields.get('email'))
         user = self.model(userid=userid, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -66,7 +63,7 @@ class Usuario(AbstractBaseUser):
         # Error/Exception Handling
         try:
             return self.check_password(password)
-        except Exception as e:
+        except Exception:
             self.loginstatus = 'error'
             self.save()
             return False
