@@ -1,10 +1,24 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.core.exceptions import ValidationError
+from datetime import datetime
+
+# Cookbook: funciones utilitarias para usuario
+def validar_email_unico(email):
+    if Usuario.objects.filter(email=email).exists():
+        raise ValidationError("El email ya está registrado.")
+
+def generar_userid(email):
+    # Receta para crear un userid único basado en el email y la fecha
+    return f"{email.split('@')[0]}_{int(datetime.now().timestamp())}"
 
 class UsuarioManager(BaseUserManager):
     def create_user(self, userid, password=None, **extra_fields):
-        if not userid:
-            raise ValueError('El usuario debe tener un userid')
+        # Error/Exception Handling
+        try:
+            validar_email_unico(extra_fields.get('email'))
+        except ValidationError as e:
+            raise e
         user = self.model(userid=userid, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -16,6 +30,7 @@ class UsuarioManager(BaseUserManager):
         return self.create_user(userid, password, **extra_fields)
 
 class Usuario(AbstractBaseUser):
+    # Persistent-Tables: modelo persistente en base de datos
     userid = models.CharField(max_length=150, unique=True)
     password = models.CharField(max_length=128)
     loginstatus = models.CharField(max_length=20, default='offline')
