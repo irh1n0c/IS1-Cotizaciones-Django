@@ -20,7 +20,7 @@ class RegistroUsuarioView(View):
         password = request.POST.get('password')
         userid = generar_userid(email)
         try:
-            user = Usuario.objects.create_user(userid=userid, email=email, password=password)
+            Usuario.objects.create_user(userid=userid, email=email, password=password)
             messages.success(request, "Usuario registrado correctamente.")
             return redirect('login')
         except Exception as e:
