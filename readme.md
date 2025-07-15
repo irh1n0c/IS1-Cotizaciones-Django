@@ -113,8 +113,9 @@ Este proyecto está en desarrollo activo. Para contribuir:
 4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
 5. Crea un Pull Request
 
+## Diagrama UML: 
+![Diagrama uml](sources/diagrama_uml.png)
 
-
+## Prueba del sever de DJANGO corriendo en local: 
 ![Prueba del server corriendo](sources/imagen_django_run.png)
 
-![Diagrama uml](sources/diagrama_uml.png)
