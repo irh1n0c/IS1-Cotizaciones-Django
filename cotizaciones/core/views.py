@@ -13,7 +13,7 @@ def obtener_usuario_por_email(email):
 # Pipeline + Error/Exception Handling: vista de registro
 class RegistroUsuarioView(View):
     def get(self, request):
-        return render(request, 'registro.html')
+        return render(request, 'core/registro.html')
 
     def post(self, request):
         email = request.POST.get('email')
@@ -25,12 +25,12 @@ class RegistroUsuarioView(View):
             return redirect('login')
         except Exception as e:
             messages.error(request, f"Error en el registro: {e}")
-            return render(request, 'registro.html')
+            return render(request, 'core/registro.html')
 
 # Pipeline + Error/Exception Handling: vista de login
 class LoginUsuarioView(View):
     def get(self, request):
-        return render(request, 'login.html')
+        return render(request, 'core/login.html')
 
     def post(self, request):
         email = request.POST.get('email')
@@ -41,9 +41,12 @@ class LoginUsuarioView(View):
             return redirect('home')
         else:
             messages.error(request, "Credenciales incorrectas.")
-            return render(request, 'login.html')
+            return render(request, 'core/login.html')
 
 # Persistent-Tables: vista de perfil
 def perfil_usuario(request, userid):
     user = Usuario.objects.get(userid=userid)
-    return render(request, 'perfil.html', {'usuario': user})
+    return render(request, 'core/perfil.html', {'usuario': user})
+
+def home(request):
+    return render(request, 'core/home.html')
