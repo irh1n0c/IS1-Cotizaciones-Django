@@ -1,3 +1,27 @@
+<<<<<<< HEAD
 __pycache__/
 *.pyc
 db.sqlite3
+=======
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# SQLite database
+*.sqlite3
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.mo
+db.sqlite3
+
+# VSCode
+.vscode/
+
+# Environments
+.env
+venv/
+>>>>>>> ac1a8e9 (Agrega .gitignore y elimina archivos ignorados del control de versiones)
