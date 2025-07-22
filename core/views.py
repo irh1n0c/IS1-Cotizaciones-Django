@@ -1,73 +1,77 @@
-from django.shortcuts import render
-from django.shortcuts import render, redirect
+# core/views.py
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status, permissions
 from django.contrib.auth.models import User
-from django.contrib.auth import login
-from .models import PerfilCliente
-
-from .forms import RegistroClienteForm
-
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from .models import PerfilCliente
+from .serializers import RegistroClienteSerializer, PerfilClienteSerializer
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 
-def registro_cliente(request):
-    if request.method == 'POST':
-        form = RegistroClienteForm(request.POST)
-        if form.is_valid():
-            user = User.objects.create_user(
-                username=form.cleaned_data['username'],
-                email=form.cleaned_data['email'],
-                password=form.cleaned_data['password']
-            )
-            PerfilCliente.objects.create(
-                user=user,
-                ruc=form.cleaned_data['ruc'],
-                direccion=form.cleaned_data['direccion'],
-                telefono=form.cleaned_data['telefono']
-            )
-            login(request, user)
-            return redirect('dashboard_cliente')
-    else:
-        form = RegistroClienteForm()
-    return render(request, 'registro_cliente.html', {'form': form})
+# REGISTRO DE USUARIO + PERFIL CLIENTE
+class RegistroClienteAPI(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = RegistroClienteSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'Registro exitoso'}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-def login_view(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
+# LOGIN API
+class LoginAPI(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
         user = authenticate(request, username=username, password=password)
         if user:
             login(request, user)
             if hasattr(user, 'perfilcliente'):
-                return redirect('dashboard_cliente')
+                return Response({'message': 'Login exitoso', 'rol': 'cliente'})
             else:
-                return redirect('dashboard_admin')
-        else:
-            return render(request, 'login.html', {'error': 'Credenciales inválidas'})
-    return render(request, 'login.html')
+                return Response({'message': 'Login exitoso', 'rol': 'admin'})
+        return Response({'error': 'Credenciales inválidas'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-def logout_view(request):
-    logout(request)
-    return redirect('login')
+# LOGOUT API
+class LogoutAPI(APIView):
+    permission_classes = [IsAuthenticated]
 
-from django.shortcuts import redirect
-
-def home(request):
-    return redirect('login')  # o 'registro_cliente' si prefieres
-
+    def post(self, request):
+        logout(request)
+        return Response({'message': 'Sesión cerrada correctamente'}, status=status.HTTP_200_OK)
 
 
-@login_required
-def dashboard_cliente(request):
+# HOME REDIRECT
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def home_api(request):
+    return Response({'message': 'Redirige a login'}, status=status.HTTP_302_FOUND)
+
+
+# DASHBOARD CLIENTE API
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def dashboard_cliente_api(request):
     if not hasattr(request.user, 'perfilcliente'):
-        return redirect('dashboard_admin')
-    return render(request, 'dashboard_cliente.html', {'usuario': request.user})
+        return Response({'error': 'No autorizado como cliente'}, status=status.HTTP_403_FORBIDDEN)
+    
+    perfil = PerfilCliente.objects.get(user=request.user)
+    serializer = PerfilClienteSerializer(perfil)
+    return Response({'perfil': serializer.data})
 
-@login_required
-def dashboard_admin(request):
+
+# DASHBOARD ADMIN API
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def dashboard_admin_api(request):
     if hasattr(request.user, 'perfilcliente'):
-        return redirect('dashboard_cliente')
-    return render(request, 'dashboard_admin.html', {'usuario': request.user})
+        return Response({'error': 'No autorizado como admin'}, status=status.HTTP_403_FORBIDDEN)
+    
+    return Response({'message': f'Bienvenido, {request.user.username} (admin)'})
