@@ -14,15 +14,18 @@ def generar_userid(email):
 
 class UsuarioManager(BaseUserManager):
     def create_user(self, userid, password=None, **extra_fields):
-        # Error/Exception Handling
-        try:
-            validar_email_unico(extra_fields.get('email'))
-        except ValidationError as e:
-            raise e
+        if not userid:
+            raise ValueError("El campo 'userid' es obligatorio.")
+        if not password:
+            raise ValueError("La contraseña es obligatoria.")
+        if 'email' not in extra_fields or not extra_fields['email']:
+            raise ValueError("El email es obligatorio.")
+        
         user = self.model(userid=userid, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
+
 
     def create_superuser(self, userid, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
@@ -48,25 +51,13 @@ class Usuario(AbstractBaseUser):
     def __str__(self):
         return self.userid
 
-    # Pipeline: proceso de login encadenado
-    def login_pipeline(self, password):
-        # Paso 1: verificar credenciales
-        if not self.verifiLogin(password):
-            self.loginstatus = 'failed'
-            self.save()
-            return False
-        # Paso 2: actualizar estado
-        self.loginstatus = 'online'
-        self.save()
-        # Paso 3: registrar acceso (cookbook)
-        self.registrar_acceso()
-        return True
+    # DESPUÉS
+    def verify_login(self, password):
 
-    def verifiLogin(self, password):
         # Error/Exception Handling
         try:
             return self.check_password(password)
-        except Exception as e:
+        except Exception:
             self.loginstatus = 'error'
             self.save()
             return False
@@ -81,5 +72,37 @@ class Usuario(AbstractBaseUser):
     def ultimo_acceso(self):
         # Simulación de acceso perezoso
         return self.registerdate
+    
+# NUEVO: LoginService
+class LoginService:
+    def __init__(self, usuario):
+        self.usuario = usuario
 
-# Puedes agregar más funciones utilitarias (cookbook) y procesos encadenados (pipeline) según crezca tu lógica de usuario.
+    def login(self, password):
+        if not self.usuario.check_password(password):
+            self.usuario.loginstatus = 'failed'
+            self.usuario.save()
+            return False
+        self.usuario.loginstatus = 'online'
+        self.usuario.save()
+        self.usuario.registrar_acceso()
+        return True
+
+# INTERFAZ
+class UserIdGenerator:
+    def generate(self, email):
+        raise NotImplementedError
+# IMPLEMENTACIÓN
+class TimestampUserIdGenerator(UserIdGenerator):
+    def generate(self, email):
+        return f"{email.split('@')[0]}_{int(datetime.now().timestamp())}"
+
+
+# INTERFAZ
+class IUserRepository:
+    def save(self, user): pass
+    
+# IMPLEMENTACIÓN
+class DjangoUserRepository(IUserRepository):
+    def save(self, user):
+        user.save()
