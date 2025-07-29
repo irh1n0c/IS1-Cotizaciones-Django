@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.exceptions import ValidationError
 from datetime import datetime
 
@@ -32,7 +32,12 @@ class UsuarioManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(userid, password, **extra_fields)
 
-class Usuario(AbstractBaseUser):
+class Usuario(AbstractBaseUser, PermissionsMixin):  # Añade PermissionsMixin
+    TIPO_USUARIO_CHOICES = [
+        ('CLIENTE', 'Cliente'),
+        ('ADMIN', 'Administrador'),
+    ]
+    
     # Persistent-Tables: modelo persistente en base de datos
     userid = models.CharField(max_length=150, unique=True)
     password = models.CharField(max_length=128)
@@ -42,6 +47,11 @@ class Usuario(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    tipo_usuario = models.CharField(
+        max_length=10,
+        choices=TIPO_USUARIO_CHOICES,
+        default='CLIENTE'
+    )
 
     USERNAME_FIELD = 'userid'
     REQUIRED_FIELDS = ['email']

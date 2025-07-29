@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-__pycache__/
-*.pyc
-db.sqlite3
-=======
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -24,4 +19,3 @@ db.sqlite3
 # Environments
 .env
 venv/
->>>>>>> ac1a8e9 (Agrega .gitignore y elimina archivos ignorados del control de versiones)

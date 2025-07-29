@@ -3,10 +3,18 @@
     {% csrf_token %}
     <label for="email">Email:</label>
     <input type="email" id="email" name="email" required>
+    
     <label for="password">Contraseña:</label>
     <input type="password" id="password" name="password" required>
+    
+    {% if user.is_superuser %}
+    <label for="tipo_usuario">Tipo de usuario:</label>
+    <select id="tipo_usuario" name="tipo_usuario">
+        {% for value, label in tipo_usuario_choices %}
+            <option value="{{ value }}">{{ label }}</option>
+        {% endfor %}
+    </select>
+    {% endif %}
+    
     <button type="submit">Registrarse</button>
 </form>
-{% for message in messages %}
-    <p>{{ message }}</p>
-{% endfor %}
