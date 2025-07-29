@@ -28,6 +28,9 @@ class ClienteClinica(models.Model):
     email = models.EmailField(unique=True)
     rfc = models.CharField(max_length=13)
 
+    def __str__(self):
+        return f"{self.nombres} {self.apellidos}"
+    
     def updatePerfil(self):
         # lógica a implementar luego
         pass
