@@ -119,3 +119,21 @@ Este proyecto está en desarrollo activo. Para contribuir:
 ## Prueba del sever de DJANGO corriendo en local: 
 ![Prueba del server corriendo](sources/imagen_django_run.png)
 
+## Prueba del clase ID numero de cotizacion: 
+![Input de insertacion de Id de una cotizacion](sources/number_coti.png)
+
+## Estilos usados y clean code
+
+Se hizo el uso del estilo de codigo CookBook, y Pipiline 
+
+![Uso de CookBook](sources/img/cookbook.png)
+
+##  Cleancode 
+
+![Uso de classmethod](sources/img/cleancode.png)
+
+1. Bien alineado con Clean Code
+
+2. No generaría alerta en SonarLint
+
+3. Permite reutilizar lógica sin crear instancias
