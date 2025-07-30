@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Inicio</title>
+  <link rel="stylesheet" href="/static/css/estilos.css">
+  <style>
+    .home-container {
+      background: white;
+      padding: 2em;
+      border-radius: 10px;
+      box-shadow: 0px 0px 20px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 300px;
+    }
+
+    .home-container h2 {
+      margin-bottom: 1.5em;
+      color: #333;
+    }
+
+    .home-container button {
+      width: 100%;
+      margin: 0.5em 0;
+      padding: 0.8em;
+      font-size: 1em;
+      font-weight: bold;
+      background-color: #007bff;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .home-container button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container home-container">
+    <h2>Bienvenido</h2>
+    <button onclick="window.location.href='/registro/'">📝 Registrarse</button>
+    <button onclick="window.location.href='/login/'">🔐 Iniciar sesión</button>
+    <button onclick="window.location.href='/dashboard-cliente/'">📊 Ir al Panel de Cliente</button>
+    <button onclick="window.location.href='/dashboard-admin/'">🛠️ Ir al Panel de Admin</button>
+  </div>
+</body>
+</html>

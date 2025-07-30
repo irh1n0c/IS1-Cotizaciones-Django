@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard del Cliente</title>
+  <link rel="stylesheet" href="/static/css/estilos.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Bienvenido, Cliente</h2>
+    <div id="perfil" class="mensaje">Cargando información...</div>
+    <button onclick="cerrarSesion()">Cerrar sesión</button>
+  </div>
+
+  <script>
+    async function obtenerPerfil() {
+      const res = await fetch("http://localhost:8000/api/dashboard/cliente/");
+      const perfilDiv = document.getElementById("perfil");
+
+      if (res.ok) {
+        const data = await res.json();
+        const p = data.perfil;
+        perfilDiv.innerHTML = `
+          <p><strong>RUC:</strong> ${p.ruc}</p>
+          <p><strong>Dirección:</strong> ${p.direccion}</p>
+          <p><strong>Teléfono:</strong> ${p.telefono}</p>
+        `;
+      } else {
+        perfilDiv.textContent = "No autorizado.";
+      }
+    }
+
+    function cerrarSesion() {
+      fetch("http://localhost:8000/api/logout/", {
+        method: "POST"
+      }).then(() => window.location.href = "/login/");
+    }
+
+    obtenerPerfil();
+  </script>
+</body>
+</html>
+

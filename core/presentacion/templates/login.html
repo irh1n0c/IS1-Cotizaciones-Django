@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Iniciar Sesión</title>
+  <link rel="stylesheet" href="/static/css/estilos.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Iniciar Sesión</h2>
+    <form id="form-login" class="formulario">
+      <input type="text" name="username" placeholder="Nombre de usuario" required>
+      <input type="password" name="password" placeholder="Contraseña" required>
+      <button type="submit">Entrar</button>
+    </form>
+    <div id="mensaje" class="mensaje"></div>
+  </div>
+  <script>
+    document.getElementById("form-login").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const data = {
+        username: this.username.value,
+        password: this.password.value
+      };
+
+      const res = await fetch("http://localhost:8000/api/login/", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+      });
+
+      const mensajeDiv = document.getElementById("mensaje");
+
+      if (res.ok) {
+        const result = await res.json();
+        mensajeDiv.style.color = "green";
+        mensajeDiv.textContent = "✅ " + result.message;
+        // Redirige al dashboard correspondiente
+        if (result.rol === "cliente") {
+          window.location.href = "/dashboard-cliente/";
+        } else {
+          window.location.href = "/dashboard-admin/";
+        }
+      } else {
+        const error = await res.json();
+        mensajeDiv.style.color = "red";
+        mensajeDiv.textContent = "❌ " + (error.error || "Error al iniciar sesión");
+      }
+    });
+  </script>
+</body>
+</html>
