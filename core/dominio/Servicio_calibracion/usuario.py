@@ -1,33 +1,24 @@
 from django.db import models
-from django.contrib.auth.models import User, AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.exceptions import ValidationError
 from datetime import datetime
-from django.conf import settings
 
-
-# ────── MODELO DE PERFIL CLIENTE (USUARIO ESTÁNDAR DJANGO) ──────
-class PerfilCliente(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    ruc_dni = models.CharField(max_length=20, unique=True)
-    direccion = models.CharField(max_length=200)
-    telefono = models.CharField(max_length=15)
-
-    def __str__(self):
-        return self.user.username
-
-
-# ────── FUNCIONES UTILITARIAS PARA USUARIO PERSONALIZADO ──────
+# Cookbook: funciones utilitarias para usuario
 def validar_email_unico(email):
     if Usuario.objects.filter(email=email).exists():
         raise ValidationError("El email ya está registrado.")
 
 def generar_userid(email):
+    # Receta para crear un userid único basado en el email y la fecha
     return f"{email.split('@')[0]}_{int(datetime.now().timestamp())}"
 
-# ────── MANAGER PERSONALIZADO ──────
 class UsuarioManager(BaseUserManager):
     def create_user(self, userid, password=None, **extra_fields):
-        validar_email_unico(extra_fields.get('email'))
+        # Error/Exception Handling
+        try:
+            validar_email_unico(extra_fields.get('email'))
+        except ValidationError as e:
+            raise e
         user = self.model(userid=userid, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -38,8 +29,8 @@ class UsuarioManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(userid, password, **extra_fields)
 
-# ────── MODELO DE USUARIO PERSONALIZADO ──────
 class Usuario(AbstractBaseUser):
+    # Persistent-Tables: modelo persistente en base de datos
     userid = models.CharField(max_length=150, unique=True)
     password = models.CharField(max_length=128)
     loginstatus = models.CharField(max_length=20, default='offline')
@@ -57,46 +48,38 @@ class Usuario(AbstractBaseUser):
     def __str__(self):
         return self.userid
 
+    # Pipeline: proceso de login encadenado
     def login_pipeline(self, password):
+        # Paso 1: verificar credenciales
         if not self.verifiLogin(password):
             self.loginstatus = 'failed'
             self.save()
             return False
+        # Paso 2: actualizar estado
         self.loginstatus = 'online'
         self.save()
+        # Paso 3: registrar acceso (cookbook)
         self.registrar_acceso()
         return True
 
     def verifiLogin(self, password):
+        # Error/Exception Handling
         try:
             return self.check_password(password)
-        except Exception:
+        except Exception as e:
             self.loginstatus = 'error'
             self.save()
             return False
 
+    # Cookbook: receta para registrar acceso
     def registrar_acceso(self):
+        # Aquí podrías guardar en una tabla de auditoría, enviar notificación, etc.
         pass
 
+    # Lazy-Rivers: método que solo calcula el último acceso si se solicita
     @property
     def ultimo_acceso(self):
+        # Simulación de acceso perezoso
         return self.registerdate
 
-
-
-# algo random que estoy anadiendo asjkdhskasjdh
-
-from django.db import models
-
-class CotizacionModel(models.Model):
-    num_quotation = models.CharField(max_length=20, unique=True)
-    client_id = models.IntegerField()
-    description = models.TextField()
-    date_added = models.DateTimeField()
-    date_created = models.DateTimeField()
-    date_deleted = models.DateTimeField(null=True, blank=True)
-    marca = models.CharField(max_length=100, null=True, blank=True)
-    numero_serie = models.CharField(max_length=100, null=True, blank=True)
-
-    def __str__(self):
-        return self.num_quotation
+# Puedes agregar más funciones utilitarias (cookbook) y procesos encadenados (pipeline) según crezca tu lógica de usuario.

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registrar Cotización</title>
+</head>
+<body>
+    <h1>Registrar Cotización</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label>Tipo (C/H):</label>
+        <input type="text" name="tipo" required><br><br>
+
+        <label>Secuencia:</label>
+        <input type="number" name="secuencia" required><br><br>
+
+        <label>ID del Cliente:</label>
+        <input type="number" name="cliente_id" required><br><br>
+
+        <label>Descripción:</label>
+        <textarea name="descripcion" required></textarea><br><br>
+
+        <input type="submit" value="Guardar Cotización">
+    </form>
+
+    {% if numero %}
+        <h3>✅ Cotización registrada: {{ numero }}</h3>
+    {% elif error %}
+        <h3 style="color:red;">❌ Error: {{ error }}</h3>
+    {% endif %}
+</body>
+</html>
