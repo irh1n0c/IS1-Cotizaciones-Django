@@ -15,6 +15,7 @@ class PerfilCliente(models.Model):
     def __str__(self):
         return self.user.username
 
+
 # ────── FUNCIONES UTILITARIAS PARA USUARIO PERSONALIZADO ──────
 def validar_email_unico(email):
     if Usuario.objects.filter(email=email).exists():

@@ -1,12 +1,81 @@
-# ────────────── VISTAS USUARIO NORMAL (USUARIO DJANGO) ──────────────
+# ────────────── IMPORTACIONES VISTAS ──────────────
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.views import View
 from django.http import HttpResponse
 
-from .models import PerfilCliente
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status, permissions
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+
+from .models import PerfilCliente, Usuario, generar_userid
+from .serializers import RegistroClienteSerializer, PerfilClienteSerializer
 from .forms import RegistroClienteForm
+
+
+# ────────────── VISTAS API REST ──────────────
+
+class RegistroClienteAPI(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = RegistroClienteSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'Registro exitoso'}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class LoginAPI(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user:
+            login(request, user)
+            if hasattr(user, 'perfilcliente'):
+                return Response({'message': 'Login exitoso', 'rol': 'cliente'})
+            else:
+                return Response({'message': 'Login exitoso', 'rol': 'admin'})
+        return Response({'error': 'Credenciales inválidas'}, status=status.HTTP_401_UNAUTHORIZED)
+
+class LogoutAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        logout(request)
+        return Response({'message': 'Sesión cerrada correctamente'}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def home_api(request):
+    return Response({'message': 'Redirige a login'}, status=status.HTTP_302_FOUND)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def dashboard_cliente_api(request):
+    if not hasattr(request.user, 'perfilcliente'):
+        return Response({'error': 'No autorizado como cliente'}, status=status.HTTP_403_FORBIDDEN)
+    
+    perfil = PerfilCliente.objects.get(user=request.user)
+    serializer = PerfilClienteSerializer(perfil)
+    return Response({'perfil': serializer.data})
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def dashboard_admin_api(request):
+    if hasattr(request.user, 'perfilcliente'):
+        return Response({'error': 'No autorizado como admin'}, status=status.HTTP_403_FORBIDDEN)
+    return Response({'message': f'Bienvenido, {request.user.username} (admin)'})
+
+
+# ────────────── VISTAS BASADAS EN HTML Y FORMULARIOS ──────────────
 
 def registro_cliente(request):
     if request.method == 'POST':
@@ -36,12 +105,7 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user:
             login(request, user)
-            if hasattr(user, 'perfilcliente'):
-                return redirect('dashboard_cliente')
-            else:
-                return redirect('dashboard_admin')
-        else:
-            return render(request, 'login.html', {'error': 'Credenciales inválidas'})
+            return redirect('dashboard_cliente')
     return render(request, 'login.html')
 
 def logout_view(request):
@@ -51,20 +115,12 @@ def logout_view(request):
 @login_required
 def dashboard_cliente(request):
     if not hasattr(request.user, 'perfilcliente'):
-        return redirect('dashboard_admin')
-    return render(request, 'dashboard_cliente.html', {'usuario': request.user})
-
-@login_required
-def dashboard_admin(request):
-    if hasattr(request.user, 'perfilcliente'):
-        return redirect('dashboard_cliente')
-    return render(request, 'dashboard_admin.html', {'usuario': request.user})
+        return redirect('login')
+    perfil = PerfilCliente.objects.get(user=request.user)
+    return render(request, 'dashboard_cliente.html', {'perfil': perfil})
 
 
-# ────────────── VISTAS USUARIO PERSONALIZADO (CLASE USUARIO) ──────────────
-from django.contrib import messages
-from django.views import View
-from .models import Usuario, generar_userid
+# ────────────── VISTAS PERSONALIZADAS DE USUARIO (Clase Usuario) ──────────────
 
 def obtener_usuario_por_email(email):
     try:
@@ -107,6 +163,5 @@ def perfil_usuario(request, userid):
     user = Usuario.objects.get(userid=userid)
     return render(request, 'core/perfil.html', {'usuario': user})
 
-# Puedes dejar esta versión de home o combinarla con la otra
 def home(request):
     return redirect('login')  # o render(request, 'core/home.html')
