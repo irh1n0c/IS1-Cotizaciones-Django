@@ -1,13 +1,7 @@
-Aquí tienes el contenido completo del `README.md` **listo para copiar y pegar** directamente en tu archivo `README.md` del proyecto:
 
----
-
-```markdown
-# 🏥 IS1 - Módulo de Registro de Clientes - Django Backend
+## 🏥 IS1 - Módulo de Registro de Clientes - Django Backend
 
 Este proyecto forma parte del sistema de cotizaciones desarrollado para el curso de Ingeniería de Software 1. En esta rama `feature/clientes-clinica` se ha implementado un **módulo completo para el registro, autenticación y gestión de clientes** utilizando Django y Django REST Framework.
-
----
 
 ## 🔧 Tecnologías utilizadas
 
@@ -18,12 +12,10 @@ Este proyecto forma parte del sistema de cotizaciones desarrollado para el curso
 - Django Admin  
 - Autenticación basada en sesiones  
 
----
 
 ## 📁 Estructura del módulo
 
 ```
-
 core/
 ├── cliente.py              # Modelo PerfilCliente
 ├── serializers.py          # RegistroClienteSerializer, PerfilClienteSerializer
@@ -31,10 +23,7 @@ core/
 ├── urls.py                 # Endpoints REST
 ├── forms.py                # Formulario tradicional para clientes (opcional)
 
-````
-
----
-
+```
 ## 🧠 Funcionalidades implementadas
 
 ### ✅ Registro de cliente
@@ -129,16 +118,14 @@ python manage.py runserver
 
 Esta implementación cumple con los criterios establecidos en la rúbrica técnica del curso. A continuación, se justifica cada uno de los aspectos evaluados:
 
-### 1. 🎯 Estilos de Programación (3/3 puntos)
-
+### 1. 🎯 Estilos de Programación 
 * Se emplean buenas prácticas de nomenclatura (`snake_case`, nombres descriptivos).
 * Separación clara entre capas (modelos, vistas, serializadores).
 * Uso correcto de comentarios y estructura coherente.
 * Se sigue la convención de Django REST Framework para vistas basadas en clases.
 * ✔️ **Cumple con más de 4 estilos diferentes.**
 
-### 2. 🧼 Prácticas de Codificación Limpia - *Clean Code* (3/3 puntos)
-
+### 2. 🧼 Prácticas de Codificación Limpia - *Clean Code* 
 * No hay código duplicado.
 * Cada clase o función tiene una única responsabilidad.
 * El código es legible, con lógica explícita.
@@ -146,8 +133,7 @@ Esta implementación cumple con los criterios establecidos en la rúbrica técni
 * Estructura modular por componente (cliente, autenticación, etc.).
 * ✔️ **Aplicadas más de 5 prácticas limpias.**
 
-### 3. 🧱 Principios SOLID (3/3 puntos)
-
+### 3. 🧱 Principios SOLID
 * **S: Single Responsibility** → Cada clase hace una sola cosa (por ejemplo, `RegistroClienteSerializer` solo registra).
 * **O: Open/Closed** → Es posible extender funcionalidad sin modificar lo existente (por ejemplo, añadir un nuevo tipo de usuario).
 * **L: Liskov** → Las subclases (`APIView`) respetan las interfaces esperadas.
@@ -155,8 +141,7 @@ Esta implementación cumple con los criterios establecidos en la rúbrica técni
 * **D: Dependency Inversion** → Se desacopla lógica de acceso a datos a través del ORM.
 * ✔️ **Cumplidos los 5 principios SOLID.**
 
-### 4. 📘 Domain-Driven Design (DDD) (3/3 puntos)
-
+### 4. 📘 Domain-Driven Design (DDD) 
 * **Entidades**: `PerfilCliente` como representación del dominio.
 * **Servicios de dominio**: `views.py` encapsula la lógica de negocio.
 * **Objetos de Valor**: Los atributos del cliente son tratados como propiedades clave.
@@ -164,10 +149,8 @@ Esta implementación cumple con los criterios establecidos en la rúbrica técni
 * **Fábricas y Repositorios**: El ORM de Django actúa como repositorio para la persistencia.
 * ✔️ **Aplicado DDD completo con todos sus componentes.**
 
-### 5. 🏗️ Estilos o Patrones de Arquitectura (3/3 puntos)
-
+### 5. 🏗️ Estilos o Patrones de Arquitectura 
 * Estructura **por capas**:
-
   * **Presentación**: `urls.py` define las rutas.
   * **Aplicación**: `views.py` ejecuta la lógica del negocio.
   * **Dominio**: `models.py`, `serializers.py`.
