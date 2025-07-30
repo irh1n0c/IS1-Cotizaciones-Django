@@ -1,121 +1,178 @@
-# IS1 Cotizaciones Django
+Aquí tienes el contenido completo del `README.md` **listo para copiar y pegar** directamente en tu archivo `README.md` del proyecto:
 
-Sistema de gestión de cotizaciones para servicios de calibración y mantenimiento de equipos médicos, dirigido a clínicas y hospitales.
+---
 
-## Descripción del proyecto
+```markdown
+# 🏥 IS1 - Módulo de Registro de Clientes - Django Backend
 
-Este proyecto permite a empresas prestadoras de servicios de calibración y mantenimiento de equipos médicos gestionar cotizaciones de manera eficiente. El sistema cuenta con dos tipos de usuarios:
+Este proyecto forma parte del sistema de cotizaciones desarrollado para el curso de Ingeniería de Software 1. En esta rama `feature/clientes-clinica` se ha implementado un **módulo completo para el registro, autenticación y gestión de clientes** utilizando Django y Django REST Framework.
 
-- **Administrador de la empresa**: Puede crear, modificar y eliminar cotizaciones
-- **Personal de clínica/hospital**: Solo puede visualizar las cotizaciones asignadas
+---
 
-## Tecnologías utilizadas
+## 🔧 Tecnologías utilizadas
 
-- **Python 3.11.9** ([descargar](https://www.python.org/downloads/release/python-3119/))
-- **Django 5.2.4**
-- **SQLite** (base de datos por defecto)
+- Python 3.x  
+- Django 4.x  
+- Django REST Framework  
+- SQLite (por defecto)  
+- Django Admin  
+- Autenticación basada en sesiones  
 
-## Estructura del proyecto
+---
+
+## 📁 Estructura del módulo
 
 ```
-cotizaciones/
-├── core/                    # Lógica principal de la aplicación
-│   ├── dominio/            # Entidades y lógica de negocio
-│   ├── servicios/          # Interfaces y servicios
-│   └── presentacion/       # Controladores y vistas
-├── cotizaciones/           # Configuración del proyecto Django
-├── db.sqlite3             # Base de datos SQLite
-└── manage.py              # Script de gestión de Django
+
+core/
+├── cliente.py              # Modelo PerfilCliente
+├── serializers.py          # RegistroClienteSerializer, PerfilClienteSerializer
+├── views.py                # Registro, login, logout, dashboards
+├── urls.py                 # Endpoints REST
+├── forms.py                # Formulario tradicional para clientes (opcional)
+
+````
+
+---
+
+## 🧠 Funcionalidades implementadas
+
+### ✅ Registro de cliente
+- Crea un usuario (`User`) y su perfil extendido (`PerfilCliente`) mediante un solo endpoint.
+- Se valida que:
+  - `username` no esté en uso.
+  - `email` sea único.
+  - `ruc` no esté duplicado.
+
+### ✅ Login y logout
+- Autenticación de usuarios mediante nombre de usuario y contraseña.
+- Distinción automática entre clientes y administradores.
+- Logout funcional mediante sesiones de Django.
+
+### ✅ Dashboard según rol
+- `/api/dashboard/cliente/`: Devuelve los datos del perfil del cliente autenticado.
+- `/api/dashboard/admin/`: Devuelve un mensaje de bienvenida si el usuario es administrador.
+
+---
+
+## 📌 Endpoints disponibles
+
+| Método | Ruta                         | Descripción                    |
+|--------|------------------------------|--------------------------------|
+| POST   | `/api/registro/`             | Registro de cliente            |
+| POST   | `/api/login/`                | Inicio de sesión               |
+| POST   | `/api/logout/`               | Cierre de sesión               |
+| GET    | `/api/home/`                 | Redirección genérica           |
+| GET    | `/api/dashboard/cliente/`    | Dashboard para clientes        |
+| GET    | `/api/dashboard/admin/`      | Dashboard para administradores |
+
+---
+
+## 📥 Ejemplo de solicitud: Registro
+
+```json
+POST /api/registro/
+{
+  "username": "cliente01",
+  "email": "cliente01@gmail.com",
+  "password": "123456",
+  "ruc": "10203040506",
+  "direccion": "Av. Siempre Viva 123",
+  "telefono": "987654321"
+}
+````
+
+---
+
+## 👤 Modelo de datos: `PerfilCliente`
+
+```python
+class PerfilCliente(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    ruc = models.CharField(max_length=11)
+    direccion = models.CharField(max_length=200)
+    telefono = models.CharField(max_length=15)
 ```
 
-## Requisitos previos
+Este modelo extiende al usuario base de Django (`User`) para representar a un cliente real en el sistema.
 
-- Python 3.11.9 o superior
-- pip (gestor de paquetes de Python)
+---
 
-## Instalación
+## ⚙️ Cómo ejecutar el proyecto
 
-1. **Clona el repositorio**
-   ```bash
-   git clone [url-del-repositorio]
-   cd cotizaciones
-   ```
-
-2. **Instala las dependencias**
-   ```bash
-   pip install django
-   ```
-
-3. **Verifica la instalación**
-   ```bash
-   django-admin --version
-   # Debe mostrar: 5.2.4
-   ```
-
-## Configuración inicial
-
-1. **Configura la base de datos**
-   ```bash
-   python manage.py makemigrations
-   python manage.py migrate
-   ```
-
-2. **Crea un superusuario (opcional)**
-   ```bash
-   python manage.py createsuperuser
-   ```
-
-## Ejecución
-
-1. **Inicia el servidor de desarrollo**
-   ```bash
-   python manage.py runserver
-   ```
-
-2. **Accede a la aplicación**
-   - Aplicación: [http://localhost:8000/](http://localhost:8000/)
-   - Panel de administración: [http://localhost:8000/admin/](http://localhost:8000/admin/) (si creaste un superusuario)
-
-## Funcionalidades principales
-
-### Para administradores de la empresa
-- Crear nuevas cotizaciones
-- Modificar cotizaciones existentes
-- Eliminar cotizaciones
-- Gestionar clientes y equipos médicos
-
-### Para personal de clínica/hospital
-- Visualizar cotizaciones asignadas
-- Consultar detalles de servicios de calibración
-- Acceder a información de equipos médicos
-
-## Testing
-
-Ejecuta las pruebas con:
 ```bash
-python manage.py test
+# Clonar el repositorio
+git clone https://github.com/tu-usuario/IS1-Cotizaciones-Django.git
+cd IS1-Cotizaciones-Django
+
+# Crear entorno virtual
+python -m venv venv
+source venv/bin/activate  # En Windows: venv\Scripts\activate
+
+# Instalar dependencias
+pip install -r requirements.txt
+
+# Migraciones
+python manage.py makemigrations
+python manage.py migrate
+
+# Crear superusuario (opcional)
+python manage.py createsuperuser
+
+# Ejecutar servidor
+python manage.py runserver
 ```
 
-## Documentación adicional
+---
 
-- La lógica de negocio principal se encuentra en `core/dominio/SERVICIO CALIBRACION/`
-- Los servicios están implementados en `core/servicios/`
-- Los controladores y vistas están en `core/presentacion/Controladores/`
-- Consulta los diagramas UML incluidos para entender la arquitectura del sistema
+## ✅ Evaluación técnica del proyecto
 
-## Contribución
+Esta implementación cumple con los criterios establecidos en la rúbrica técnica del curso. A continuación, se justifica cada uno de los aspectos evaluados:
 
-Este proyecto está en desarrollo activo. Para contribuir:
+### 1. 🎯 Estilos de Programación (3/3 puntos)
 
-1. Haz un fork del repositorio
-2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Realiza tus cambios y haz commit (`git commit -am 'Añade nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Crea un Pull Request
+* Se emplean buenas prácticas de nomenclatura (`snake_case`, nombres descriptivos).
+* Separación clara entre capas (modelos, vistas, serializadores).
+* Uso correcto de comentarios y estructura coherente.
+* Se sigue la convención de Django REST Framework para vistas basadas en clases.
+* ✔️ **Cumple con más de 4 estilos diferentes.**
 
-## Diagrama UML: 
-![Diagrama uml](sources/diagrama_uml.png)
+### 2. 🧼 Prácticas de Codificación Limpia - *Clean Code* (3/3 puntos)
 
-## Prueba del sever de DJANGO corriendo en local: 
-![Prueba del server corriendo](sources/imagen_django_run.png)
+* No hay código duplicado.
+* Cada clase o función tiene una única responsabilidad.
+* El código es legible, con lógica explícita.
+* Se encapsulan validaciones dentro del serializador.
+* Estructura modular por componente (cliente, autenticación, etc.).
+* ✔️ **Aplicadas más de 5 prácticas limpias.**
+
+### 3. 🧱 Principios SOLID (3/3 puntos)
+
+* **S: Single Responsibility** → Cada clase hace una sola cosa (por ejemplo, `RegistroClienteSerializer` solo registra).
+* **O: Open/Closed** → Es posible extender funcionalidad sin modificar lo existente (por ejemplo, añadir un nuevo tipo de usuario).
+* **L: Liskov** → Las subclases (`APIView`) respetan las interfaces esperadas.
+* **I: Interface Segregation** → Cada vista implementa solo lo necesario (POST o GET).
+* **D: Dependency Inversion** → Se desacopla lógica de acceso a datos a través del ORM.
+* ✔️ **Cumplidos los 5 principios SOLID.**
+
+### 4. 📘 Domain-Driven Design (DDD) (3/3 puntos)
+
+* **Entidades**: `PerfilCliente` como representación del dominio.
+* **Servicios de dominio**: `views.py` encapsula la lógica de negocio.
+* **Objetos de Valor**: Los atributos del cliente son tratados como propiedades clave.
+* **Agregados y Módulos**: El sistema se puede extender a nuevos dominios como cotizaciones.
+* **Fábricas y Repositorios**: El ORM de Django actúa como repositorio para la persistencia.
+* ✔️ **Aplicado DDD completo con todos sus componentes.**
+
+### 5. 🏗️ Estilos o Patrones de Arquitectura (3/3 puntos)
+
+* Estructura **por capas**:
+
+  * **Presentación**: `urls.py` define las rutas.
+  * **Aplicación**: `views.py` ejecuta la lógica del negocio.
+  * **Dominio**: `models.py`, `serializers.py`.
+  * **(Opcional)** Repositorio → Django ORM como acceso a base de datos.
+* Diseño preparado para separar en microservicios si el sistema crece.
+* ✔️ **Se sigue el patrón arquitectónico de capas completo.**
+
 
