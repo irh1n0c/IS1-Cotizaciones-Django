@@ -119,6 +119,13 @@ python manage.py runserver
 Esta implementación cumple con los criterios establecidos en la rúbrica técnica del curso. A continuación, se justifica cada uno de los aspectos evaluados:
 
 ### 1. 🎯 Estilos de Programación 
+Estilos usado en medical_equipment
+
+* Structured
+* Poo ( object oriented programing)
+* Cookbook
+* Layared
+
 * Se emplean buenas prácticas de nomenclatura (`snake_case`, nombres descriptivos).
 * Separación clara entre capas (modelos, vistas, serializadores).
 * Uso correcto de comentarios y estructura coherente.
