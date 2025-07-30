@@ -6,15 +6,20 @@ class NumeroCotizacion:
         self.prefijo = None
         self.numero = None
         self.year = None
-
-    def numcotizacion(self):
-        #Metodo
-        pass
+        self.generador = GeneradorCotizacion()
+        self.validador = ValidadorCotizacion()
 
     def generar(self):
-        #Metodo
-        pass
+        self.prefijo, self.numero, self.year = self.generador.generar()
 
     def valido(self):
-        #Metodo
-        pass
+        return self.validador.validar(self)
+
+class GeneradorCotizacion:
+    def generar(self):
+        # 
+        return None, None, None
+
+class ValidadorCotizacion:
+    def validar(self, cotizacion):
+        return cotizacion.numero is not None and cotizacion.prefijo == "COT"
