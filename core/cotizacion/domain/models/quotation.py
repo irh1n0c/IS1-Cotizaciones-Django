@@ -36,5 +36,5 @@ class Quotation:
     def generar_numero_quotation(tipo: str, secuencia: int) -> str:
         if tipo not in ['C', 'H']:
             raise ValueError("El tipo debe ser 'C' (Comercial) o 'H' (Habitacional)")
-        año = datetime.now().year
-        return f"{tipo}{año}{secuencia:03d}"
+        year = datetime.now().year
+        return f"{tipo}{year}{secuencia:03d}"

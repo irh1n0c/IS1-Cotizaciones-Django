@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-class Estado Cotizacion:
+class EstadoCotizacion:
     def __init__(self):
         self.borrador = None
         self.enviada = None

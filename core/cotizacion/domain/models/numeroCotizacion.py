@@ -1,17 +1,20 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-class Numero Cotizacion:
+class NumeroCotizacion:
     def __init__(self):
         self.prefijo = None
         self.numero = None
-        self.año = None
+        self.year = None
 
-    def numCotizacion(self, ):
+    def numcotizacion(self):
+        #Metodo
         pass
 
-    def generar(self, ):
+    def generar(self):
+        #Metodo
         pass
 
-    def valido(self, ):
+    def valido(self):
+        #Metodo
         pass
