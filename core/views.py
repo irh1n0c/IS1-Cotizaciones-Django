@@ -17,7 +17,14 @@ from .models import PerfilCliente, Usuario, generar_userid
 from .serializers import RegistroClienteSerializer, PerfilClienteSerializer
 from .forms import RegistroClienteForm
 
-
+"""code josel"""
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.core.paginator import Paginator
+from core.cotizacion.domain.models.equipment_details import MedicalEquipment
+from .forms import MedicalEquipmentForm, MedicalEquipmentSearchForm
+from decimal import Decimal
 # ────────────── VISTAS API REST ──────────────
 
 class RegistroClienteAPI(APIView):
@@ -165,3 +172,82 @@ def perfil_usuario(request, userid):
 
 def home(request):
     return redirect('login')  # o render(request, 'core/home.html')
+
+
+# ────────────── medical equipment ──────────────
+
+def medical_equipment_list(request):
+    """Vista para listar equipos médicos con búsqueda."""
+    search_form = MedicalEquipmentSearchForm(request.GET or None)
+    equipments = MedicalEquipmentManager.get_all_equipment()
+    
+    if search_form.is_valid():
+        name = search_form.cleaned_data.get('name')
+        brand = search_form.cleaned_data.get('brand')
+        min_price = search_form.cleaned_data.get('min_price')
+        max_price = search_form.cleaned_data.get('max_price')
+        
+        if name:
+            equipments = MedicalEquipmentManager.find_by_name(name)
+        elif brand:
+            equipments = MedicalEquipmentManager.find_by_brand(brand)
+        elif min_price and max_price:
+            equipments = MedicalEquipmentManager.find_by_price_range(min_price, max_price)
+    
+    # Paginación
+    paginator = Paginator(equipments, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'search_form': search_form,
+        'total_count': len(equipments)
+    }
+    return render(request, 'medical_equipment/list.html', context)
+
+def medical_equipment_create(request):
+    """Vista para crear un nuevo equipo médico."""
+    if request.method == 'POST':
+        form = MedicalEquipmentForm(request.POST)
+        if form.is_valid():
+            equipment = form.save()
+            messages.success(request, f'Equipo "{equipment.name}" creado exitosamente.')
+            return redirect('medical_equipment_detail', pk=equipment.id)
+    else:
+        form = MedicalEquipmentForm()
+    
+    return render(request, 'medical_equipment/create.html', {'form': form})
+
+def medical_equipment_detail(request, pk):
+    """Vista para mostrar detalles de un equipo médico."""
+    equipment = get_object_or_404(MedicalEquipment, pk=pk)
+    return render(request, 'medical_equipment/detail.html', {'equipment': equipment})
+
+def medical_equipment_update(request, pk):
+    """Vista para actualizar un equipo médico."""
+    equipment = get_object_or_404(MedicalEquipment, pk=pk)
+    
+    if request.method == 'POST':
+        form = MedicalEquipmentForm(request.POST, instance=equipment)
+        if form.is_valid():
+            equipment = form.save()
+            messages.success(request, f'Equipo "{equipment.name}" actualizado exitosamente.')
+            return redirect('medical_equipment_detail', pk=equipment.id)
+    else:
+        form = MedicalEquipmentForm(instance=equipment)
+    
+    return render(request, 'medical_equipment/update.html', {
+        'form': form,
+        'equipment': equipment
+    })
+
+@require_http_methods(["DELETE"])
+def medical_equipment_delete(request, pk):
+    """Vista para eliminar un equipo médico (AJAX)."""
+    success = MedicalEquipmentManager.delete_equipment(pk)
+    
+    if success:
+        return JsonResponse({'success': True, 'message': 'Equipo eliminado exitosamente.'})
+    else:
+        return JsonResponse({'success': False, 'message': 'Equipo no encontrado.'})

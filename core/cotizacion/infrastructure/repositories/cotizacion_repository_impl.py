@@ -1,9 +1,9 @@
 from core.cotizacion.domain.repositories.cotizacion_repository import CotizacionRepository
-from core.cotizacion.domain.models.quotation import Quotation
+from core.cotizacion.domain.models.equipment_details import MedicalEquipment
 from core.models import CotizacionModel  # Ajusta si tienes otro nombre
 
 class CotizacionRepositoryImpl(CotizacionRepository):
-    def guardar(self, cotizacion: Quotation):
+    def guardar(self, cotizacion: MedicalEquipment):
         CotizacionModel.objects.create(
             num_quotation=cotizacion.num_quotation,
             client_id=cotizacion.client_id,

@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'core.cotizacion',  #equipo medico josel
 
     'core',  # Asegúrate de registrar tu app principal
 ]
