@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Cotizaciones - Sistema DDD</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+            color: #667eea;
+        }
+
+        .logo h1 {
+            color: #333;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .page-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .page-title h2 {
+            color: #333;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .filter-group label {
+            font-size: 0.8rem;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .cotizaciones-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .cotizacion-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .cotizacion-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .cotizacion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .cotizacion-number {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+        }
+
+        .estado-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .estado-borrador {
+            background: rgba(108, 117, 125, 0.1);
+            color: #6c757d;
+        }
+
+        .estado-enviada {
+            background: rgba(0, 123, 255, 0.1);
+            color: #007bff;
+        }
+
+        .estado-aprobada {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .estado-rechazada {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .estado-vencida {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+
+        .cotizacion-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .cotizacion-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #ccc;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .pagination a,
+        .pagination span {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #667eea;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .pagination .current {
+            background: #667eea;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .page-title {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .filters {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .cotizacion-info {
+                grid-template-columns: 1fr;
+            }
+
+            .cotizacion-actions {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-list-alt"></i>
+                <h1>Lista de Cotizaciones</h1>
+            </div>
+            <div class="breadcrumb">
+                <a href="/dashboard/" style="color: #667eea; text-decoration: none;">Dashboard</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Cotizaciones</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="page-header">
+            <div class="page-title">
+                <h2>
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    Gestión de Cotizaciones
+                </h2>
+                <a href="/quotation/generate/" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Nueva Cotización
+                </a>
+            </div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Estado</label>
+                    <select id="filtroEstado">
+                        <option value="">Todos</option>
+                        <option value="borrador">Borrador</option>
+                        <option value="enviada">Enviada</option>
+                        <option value="aprobada">Aprobada</option>
+                        <option value="rechazada">Rechazada</option>
+                        <option value="vencida">Vencida</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Tipo</label>
+                    <select id="filtroTipo">
+                        <option value="">Todos</option>
+                        <option value="C">Clínica</option>
+                        <option value="H">Hospital</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Buscar</label>
+                    <input type="text" id="busqueda" placeholder="Número o cliente...">
+                </div>
+                <button class="btn btn-secondary" onclick="aplicarFiltros()">
+                    <i class="fas fa-search"></i> Filtrar
+                </button>
+            </div>
+        </div>
+
+        <div class="cotizaciones-grid" id="cotizacionesContainer">
+            <!-- Cotizaciones de ejemplo -->
+            <div class="cotizacion-card" data-estado="enviada" data-tipo="C">
+                <div class="cotizacion-header">
+                    <div class="cotizacion-number">C2025001</div>
+                    <div class="estado-badge estado-enviada">Enviada</div>
+                </div>
+                <div class="cotizacion-info">
+                    <div class="info-item">
+                        <div class="info-label">Cliente</div>
+                        <div class="info-value">Hospital Central</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Fecha Creación</div>
+                        <div class="info-value">15/01/2025</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Total</div>
+                        <div class="info-value">$15,750.00</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Equipos</div>
+                        <div class="info-value">3 equipos</div>
+                    </div>
+                </div>
+                <div class="cotizacion-actions">
+                    <button class="btn btn-info btn-sm">
+                        <i class="fas fa-eye"></i> Ver Detalles
+                    </button>
+                    <button class="btn btn-warning btn-sm">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                    <button class="btn btn-success btn-sm">
+                        <i class="fas fa-paper-plane"></i> Reenviar
+                    </button>
+                </div>
+            </div>
+
+            <div class="cotizacion-card" data-estado="aprobada" data-tipo="H">
+                <div class="cotizacion-header">
+                    <div class="cotizacion-number">H2025002</div>
+                    <div class="estado-badge estado-aprobada">Aprobada</div>
+                </div>
+                <div class="cotizacion-info">
+                    <div class="info-item">
+                        <div class="info-label">Cliente</div>
+                        <div class="info-value">Clínica Santa María</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Fecha Creación</div>
+                        <div class="info-value">20/01/2025</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Total</div>
+                        <div class="info-value">$8,500.00</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Equipos</div>
+                        <div class="info-value">1 equipo</div>
+                    </div>
+                </div>
+                <div class="cotizacion-actions">
+                    <button class="btn btn-info btn-sm">
+                        <i class="fas fa-eye"></i> Ver Detalles
+                    </button>
+                    <button class="btn btn-success btn-sm">
+                        <i class="fas fa-file-pdf"></i> Generar PDF
+                    </button>
+                </div>
+            </div>
+
+            <div class="cotizacion-card" data-estado="borrador" data-tipo="C">
+                <div class="cotizacion-header">
+                    <div class="cotizacion-number">C2025003</div>
+                    <div class="estado-badge estado-borrador">Borrador</div>
+                </div>
+                <div class="cotizacion-info">
+                    <div class="info-item">
+                        <div class="info-label">Cliente</div>
+                        <div class="info-value">Centro Médico Norte</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Fecha Creación</div>
+                        <div class="info-value">25/01/2025</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Total</div>
+                        <div class="info-value">$22,300.00</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Equipos</div>
+                        <div class="info-value">5 equipos</div>
+                    </div>
+                </div>
+                <div class="cotizacion-actions">
+                    <button class="btn btn-warning btn-sm">
+                        <i class="fas fa-edit"></i> Completar
+                    </button>
+                    <button class="btn btn-success btn-sm">
+                        <i class="fas fa-paper-plane"></i> Enviar
+                    </button>
+                    <button class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="pagination">
+            <a href="#" class="prev">
+                <i class="fas fa-chevron-left"></i> Anterior
+            </a>
+            <span class="current">1</span>
+            <a href="#">2</a>
+            <a href="#">3</a>
+            <a href="#" class="next">
+                Siguiente <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function aplicarFiltros() {
+            const estado = document.getElementById('filtroEstado').value;
+            const tipo = document.getElementById('filtroTipo').value;
+            const busqueda = document.getElementById('busqueda').value.toLowerCase();
+            const cards = document.querySelectorAll('.cotizacion-card');
+
+            cards.forEach(card => {
+                let mostrar = true;
+
+                // Filtro por estado
+                if (estado && card.dataset.estado !== estado) {
+                    mostrar = false;
+                }
+
+                // Filtro por tipo
+                if (tipo && card.dataset.tipo !== tipo) {
+                    mostrar = false;
+                }
+
+                // Filtro por búsqueda
+                if (busqueda) {
+                    const numero = card.querySelector('.cotizacion-number').textContent.toLowerCase();
+                    const cliente = card.querySelector('.info-value').textContent.toLowerCase();
+                    if (!numero.includes(busqueda) && !cliente.includes(busqueda)) {
+                        mostrar = false;
+                    }
+                }
+
+                card.style.display = mostrar ? 'block' : 'none';
+            });
+
+            // Mostrar mensaje si no hay resultados
+            const visibleCards = Array.from(cards).filter(card => card.style.display !== 'none');
+            const container = document.getElementById('cotizacionesContainer');
+            
+            if (visibleCards.length === 0) {
+                if (!document.querySelector('.empty-state')) {
+                    const emptyState = document.createElement('div');
+                    emptyState.className = 'empty-state';
+                    emptyState.innerHTML = `
+                        <i class="fas fa-search"></i>
+                        <h3>No se encontraron cotizaciones</h3>
+                        <p>Intenta ajustar los filtros de búsqueda</p>
+                    `;
+                    container.appendChild(emptyState);
+                }
+            } else {
+                const emptyState = document.querySelector('.empty-state');
+                if (emptyState) {
+                    emptyState.remove();
+                }
+            }
+        }
+
+        // Búsqueda en tiempo real
+        document.getElementById('busqueda').addEventListener('input', aplicarFiltros);
+        document.getElementById('filtroEstado').addEventListener('change', aplicarFiltros);
+        document.getElementById('filtroTipo').addEventListener('change', aplicarFiltros);
+
+        // Animaciones de entrada
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.cotizacion-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'core.apps.CoreConfig',  # Aplicación principal con arquitectura DDD
     'cotizaciones',
 ]
 
@@ -124,3 +125,65 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+# ============================================================================
+# CONFIGURACIÓN DDD (Domain-Driven Design)
+# ============================================================================
+
+# Configuración de Domain Events
+DDD_ENABLE_NOTIFICATIONS = True
+DDD_ENABLE_AUDIT = True
+DDD_ENABLE_METRICS = True
+
+# Logging para DDD
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'loggers': {
+        'ddd': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'core.dominio': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
+
+# Inicializar DDD al arrancar Django
+def setup_ddd():
+    """Inicializa la configuración DDD."""
+    try:
+        from core.dominio.Servicio_calibracion.ddd_config import setup_django_ddd
+        setup_django_ddd()
+        print("✅ DDD Configuration initialized successfully")
+        print("📋 Domain Events: Enabled")
+        print("🔔 Notifications: Enabled")
+        print("📊 Audit: Enabled")
+        print("📈 Metrics: Enabled")
+    except ImportError as e:
+        print(f"⚠️ DDD modules not found: {e}")
+        print("💡 Run the application normally, DDD will initialize on first request")
+    except Exception as e:
+        print(f"⚠️ DDD Configuration warning: {e}")
+
+# NO llamar setup_ddd aquí - se inicializará en apps.py

@@ -17,11 +17,25 @@ from core.dominio.Servicio_calibracion.quotation import (
 
 def home(request):
     """Vista principal del sistema de cotizaciones"""
-    return render(request, 'home.html')
+    return render(request, 'dashboard.html')
 
 def quotation_home(request):
     """Vista principal del sistema de cotizaciones"""
     return render(request, 'home.html')
+
+def dashboard(request):
+    """Dashboard principal con estadísticas"""
+    context = {
+        'total_cotizaciones': 24,
+        'cotizaciones_activas': 8,
+        'clientes_activos': 12,
+        'equipos_cotizados': 156,
+    }
+    return render(request, 'dashboard.html', context)
+
+def lista_cotizaciones(request):
+    """Lista de cotizaciones con filtros"""
+    return render(request, 'lista_cotizaciones.html')
 
 
 def generate_quotation_number(request):

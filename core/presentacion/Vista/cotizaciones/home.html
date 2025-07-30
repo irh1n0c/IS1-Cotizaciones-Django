@@ -3,124 +3,421 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cotización</title>
+  <title>Sistema de Cotizaciones DDD - Generar Cotización</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: sans-serif;
-      background: #f0f4f8;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-    }
-
-    .box {
-      background: white;
       padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 400px;
     }
 
-    h2 {
-      margin-bottom: 1rem;
-      color: #333;
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: white;
+      padding: 2rem;
       text-align: center;
+    }
+
+    .header i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.9;
+    }
+
+    .header h2 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+
+    .header p {
+      opacity: 0.9;
+      font-size: 1rem;
+    }
+
+    .form-container {
+      padding: 2rem;
+    }
+
+    .ddd-info {
+      background: rgba(102, 126, 234, 0.1);
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .ddd-info i {
+      color: #667eea;
+      margin-right: 0.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
     }
 
     label {
       display: block;
-      margin-top: 1rem;
       margin-bottom: 0.5rem;
-      font-weight: 500;
+      font-weight: 600;
+      color: #333;
+      font-size: 0.95rem;
     }
 
     select, input {
       width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+      padding: 1rem;
+      border: 2px solid #e1e5e9;
+      border-radius: 10px;
       font-size: 1rem;
+      transition: all 0.3s ease;
+      background: white;
     }
 
-    button {
-      margin-top: 1.5rem;
-      width: 100%;
-      padding: 10px;
-      background: #667eea;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
+    select:focus, input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      transform: translateY(-2px);
+    }
+
+    select {
       cursor: pointer;
     }
 
-    .info {
-      margin-top: 1.5rem;
+    input[readonly] {
+      background: #f8f9fa;
+      color: #666;
+    }
+
+    .btn-generate {
+      width: 100%;
+      padding: 1rem 2rem;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-generate:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-generate:active {
+      transform: translateY(0);
+    }
+
+    .result-section {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      border-radius: 10px;
       text-align: center;
-      font-size: 0.9rem;
-      color: #555;
+    }
+
+    .result-success {
+      background: rgba(40, 167, 69, 0.1);
+      border: 1px solid rgba(40, 167, 69, 0.2);
+      color: #28a745;
+    }
+
+    .result-error {
+      background: rgba(220, 53, 69, 0.1);
+      border: 1px solid rgba(220, 53, 69, 0.2);
+      color: #dc3545;
+    }
+
+    .result-code {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 1rem 0;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 2px;
+    }
+
+    .result-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .detail-item {
+      text-align: center;
+      padding: 0.75rem;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 8px;
+    }
+
+    .detail-label {
+      font-size: 0.8rem;
+      color: #666;
+      margin-bottom: 0.25rem;
+    }
+
+    .detail-value {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .navigation {
+      padding: 1.5rem 2rem;
+      background: rgba(248, 249, 250, 0.8);
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-link {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: #764ba2;
+      transform: translateX(-3px);
+    }
+
+    .loading {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 1rem;
+      }
+      
+      .header {
+        padding: 1.5rem;
+      }
+      
+      .form-container {
+        padding: 1.5rem;
+      }
+      
+      .navigation {
+        flex-direction: column;
+        gap: 1rem;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h2>Generar Cotización</h2>
-    <form method="post" action="{% url 'generate_quotation_number' %}">
-      {% csrf_token %}
-      
-      <label for="type">Tipo:</label>
-      <select name="type" id="type" required>
-        <option value="">Seleccionar...</option>
-        <option value="C">C - Clínica</option>
-        <option value="H">H - Hospital</option>
-      </select>
-      
-      <label for="year">Año:</label>
-      <input type="text" id="year" name="year" value="{{ year }}" readonly>
+  <div class="container">
+    <div class="header">
+      <i class="fas fa-file-invoice-dollar"></i>
+      <h2>Generar Cotización</h2>
+      <p>Sistema DDD - Equipos Médicos</p>
+    </div>
 
-      <label for="sequence">Número Secuencial (001–999):</label>
-      <input 
-        type="number" 
-        name="sequence" 
-        id="sequence" 
-        min="1" 
-        max="999" 
-        placeholder="001" 
-        required
-      >
-      
-      <button type="submit">Generar</button>
-    </form>
+    <div class="form-container">
+      <div class="ddd-info">
+        <i class="fas fa-cube"></i>
+        <strong>Domain-Driven Design:</strong> Generación con reglas de negocio validadas
+      </div>
 
-    {% if quotation_number %}
-      <div class="info">
-        <strong>Código:</strong> {{ quotation_number }}
-      </div>
-    {% endif %}
-    
-    {% if error %}
-      <div class="info" style="color: red;">
-        {{ error }}
-      </div>
-    {% endif %}
+      <form method="post" action="{% url 'generate_quotation_number' %}" id="quotationForm">
+        {% csrf_token %}
+        
+        <div class="form-group">
+          <label for="type">
+            <i class="fas fa-building"></i> Tipo de Cliente
+          </label>
+          <select name="type" id="type" required>
+            <option value="">Seleccionar tipo...</option>
+            <option value="C">🏥 C - Clínica</option>
+            <option value="H">🏨 H - Hospital</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="year">
+            <i class="fas fa-calendar"></i> Año
+          </label>
+          <input type="text" id="year" name="year" value="{{ year }}" readonly>
+        </div>
+
+        <div class="form-group">
+          <label for="sequence">
+            <i class="fas fa-hashtag"></i> Número Secuencial (001–999)
+          </label>
+          <input
+            type="number"
+            name="sequence"
+            id="sequence"
+            min="1"
+            max="999"
+            placeholder="Ingrese número (ej: 1, 25, 150)"
+            required
+          >
+        </div>
+        
+        <button type="submit" class="btn-generate">
+          <span class="btn-text">
+            <i class="fas fa-magic"></i> Generar Cotización
+          </span>
+          <span class="loading">
+            <div class="spinner"></div>
+            Generando...
+          </span>
+        </button>
+      </form>
+
+      {% if quotation_number %}
+        <div class="result-section result-success">
+          <i class="fas fa-check-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+          <h3>¡Cotización Generada Exitosamente!</h3>
+          <div class="result-code">{{ quotation_number }}</div>
+          <div class="result-details">
+            <div class="detail-item">
+              <div class="detail-label">Tipo</div>
+              <div class="detail-value">{{ type }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Año</div>
+              <div class="detail-value">{{ year }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Secuencia</div>
+              <div class="detail-value">{{ sequence }}</div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+      
+      {% if error %}
+        <div class="result-section result-error">
+          <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+          <h3>Error en la Generación</h3>
+          <p>{{ error }}</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="navigation">
+      <a href="/dashboard/" class="nav-link">
+        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+      </a>
+      <a href="/quotation/list/" class="nav-link">
+        Ver Cotizaciones <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
   </div>
 
   <script>
-    document.getElementById('sequence').addEventListener('blur', function(e) {
-      const value = parseInt(e.target.value);
-      if (value >= 1 && value <= 999) {
-        e.target.value = value.toString().padStart(3, '0');
-      }
-    });
-
     document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('quotationForm');
+      const sequenceInput = document.getElementById('sequence');
       const yearInput = document.getElementById('year');
+      const btnText = document.querySelector('.btn-text');
+      const loading = document.querySelector('.loading');
+
+      // Configurar año actual
       if (!yearInput.value) {
-        const year = new Date().getFullYear();
-        yearInput.value = year;
+        yearInput.value = new Date().getFullYear();
       }
+
+      // Formatear número secuencial
+      sequenceInput.addEventListener('blur', function(e) {
+        const value = parseInt(e.target.value);
+        if (value >= 1 && value <= 999) {
+          e.target.value = value.toString().padStart(3, '0');
+        }
+      });
+
+      // Animación de envío
+      form.addEventListener('submit', function(e) {
+        btnText.style.display = 'none';
+        loading.style.display = 'flex';
+        
+        // Simular delay para mostrar loading
+        setTimeout(() => {
+          // El formulario se enviará normalmente
+        }, 100);
+      });
+
+      // Efectos visuales
+      const inputs = document.querySelectorAll('input, select');
+      inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+          this.parentElement.style.transform = 'scale(1.02)';
+        });
+        
+        input.addEventListener('blur', function() {
+          this.parentElement.style.transform = 'scale(1)';
+        });
+      });
+
+      // Validación en tiempo real
+      sequenceInput.addEventListener('input', function() {
+        const value = parseInt(this.value);
+        const submitBtn = document.querySelector('.btn-generate');
+        
+        if (value < 1 || value > 999) {
+          this.style.borderColor = '#dc3545';
+          submitBtn.disabled = true;
+          submitBtn.style.opacity = '0.6';
+        } else {
+          this.style.borderColor = '#28a745';
+          submitBtn.disabled = false;
+          submitBtn.style.opacity = '1';
+        }
+      });
     });
   </script>
 </body>
