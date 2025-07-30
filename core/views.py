@@ -22,7 +22,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.core.paginator import Paginator
-from core.cotizacion.domain.models.equipment_details import MedicalEquipment
+from core.cotizacion.domain.models.equipment_details import MedicalEquipment, MedicalEquipmentManager
 from .forms import MedicalEquipmentForm, MedicalEquipmentSearchForm
 from decimal import Decimal
 # ────────────── VISTAS API REST ──────────────

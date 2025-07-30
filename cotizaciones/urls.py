@@ -20,4 +20,5 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),  # Incluye las rutas de la app core
+    path('', include('core.cotizacion.urls')),
 ]

@@ -34,5 +34,6 @@ urlpatterns = [
     path('medical-equipment/<int:pk>/', views.medical_equipment_detail, name='medical_equipment_detail'),
     path('medical-equipment/<int:pk>/update/', views.medical_equipment_update, name='medical_equipment_update'),
     path('medical-equipment/<int:pk>/delete/', views.medical_equipment_delete, name='medical_equipment_delete'),
+    
 ]
 
