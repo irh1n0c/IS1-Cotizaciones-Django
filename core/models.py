@@ -81,3 +81,22 @@ class Usuario(AbstractBaseUser):
     @property
     def ultimo_acceso(self):
         return self.registerdate
+
+
+
+# algo random que estoy anadiendo asjkdhskasjdh
+
+from django.db import models
+
+class CotizacionModel(models.Model):
+    num_quotation = models.CharField(max_length=20, unique=True)
+    client_id = models.IntegerField()
+    description = models.TextField()
+    date_added = models.DateTimeField()
+    date_created = models.DateTimeField()
+    date_deleted = models.DateTimeField(null=True, blank=True)
+    marca = models.CharField(max_length=100, null=True, blank=True)
+    numero_serie = models.CharField(max_length=100, null=True, blank=True)
+
+    def __str__(self):
+        return self.num_quotation
